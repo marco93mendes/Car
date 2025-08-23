@@ -5,7 +5,7 @@ Este projeto envolve a criação de uma tela de login com o Firebase, integraç�
 ### Requisitos
 
 - **IDE**: Android Studio
-- **Bibliotecas**: Firebase Authentication, Firebase Storage, Retrofit (para requisições REST), Google Maps (opcional)
+- **Bibliotecas**: Firebase Authentication, Firebase Storage, Retrofit (para requisições REST), Google Maps
 
 ## Instruções
 
