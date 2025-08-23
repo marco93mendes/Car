@@ -50,19 +50,19 @@ Implemente a integração com uma API REST disponível no [Link] (https://github
 
 ### 4. Exibir Localização no Google Maps
 
-Para um desafio adicional, utilize a API do Google Maps para exibir o local (`place`) associado ao carro. Essa localização é especificada pelos campos `lat` e `long` no JSON da API.
+Utilize a API do Google Maps para exibir o local (`place`) associado ao carro. Essa localização é especificada pelos campos `lat` e `long` no JSON da API.
 
 ---
 
 ### Configuração do Projeto
 
 1. **Firebase**: Configure o projeto com Firebase Authentication e Firebase Storage. Adicione o `google-services.json` ao projeto para integração.
-2. **Google Maps** (opcional): Habilite a API do Google Maps e adicione uma chave de API ao projeto.
+2. **Google Maps**: Habilite a API do Google Maps e adicione uma chave de API ao projeto.
 3. **Dependências Gradle**:
     - **Firebase**: `Firebase Authentication` e `Firebase Storage`
     - **Retrofit** para a comunicação com a API REST
-    - **Glide** ou outra biblioteca para carregamento de imagens
-    - **Google Maps SDK** (caso implemente a parte opcional)
+    - **Picasso** ou outra biblioteca para carregamento de imagens
+    - **Google Maps SDK** 
 
 ### Entrega do Exercício
 
