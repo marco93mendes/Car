@@ -15,9 +15,9 @@ Implemente uma tela de login que use um dos provedores de autenticação do Fire
 
 - **Autenticação por telefone**:
     - Configure o Firebase para aceitar o número de telefone: `+55 11 91234-5678`.
-    - Defina o código de verificação para login de teste como `101010`.
+    - Defina o código de verificação para login de teste como `123456`.
 
-- **Autenticação com Google** (caso escolha esta opção):
+- **Autenticação com Google** (caso escolha esta opção) (OPCIONAL):
     - Habilite a autenticação com Google nas configurações do Firebase Console.
     - Implemente a lógica de autenticação no aplicativo, usando o provedor de login do Google.
 
@@ -48,7 +48,7 @@ Implemente a integração com uma API REST disponível no [Link] (https://github
     - Exiba a imagem e as informações de cada carro no aplicativo.
     - Utilize Retrofit para realizar as requisições à API.
 
-### 4. (Opcional) Exibir Localização no Google Maps
+### 4. Exibir Localização no Google Maps
 
 Para um desafio adicional, utilize a API do Google Maps para exibir o local (`place`) associado ao carro. Essa localização é especificada pelos campos `lat` e `long` no JSON da API.
 
