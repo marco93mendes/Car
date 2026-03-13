@@ -1,8 +1,19 @@
 package com.example.myapitest
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.myapitest.adapater.ItemAdapter
 import com.example.myapitest.databinding.ActivityMainBinding
+import com.example.myapitest.model.Item
+import com.example.myapitest.service.RetrofitClient
+import com.example.myapitest.service.safeApiCall
+import com.example.myapitest.service.Result
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,8 +23,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        requestLocationPermission()
+        //requestLocationPermission() //TODO
         setupView()
+
+
+        //////////////////////////////////////////////////////////
+        //1- post, delete e patch
+        //2- pagina de login firebase
+        //3- imagens do firebase
+        //4- google maps
+        //////////////////////////////////////////////////////////
+
 
         // 1- Criar tela de Login com algum provedor do Firebase (Telefone, Google)
         //      Cadastrar o Seguinte celular para login de test: +5511912345678
@@ -36,7 +56,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupView() {
-        // TODO
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            fetchItems()
+        }
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+
+        binding.addCta.setOnClickListener {
+            //TODO
+        }
     }
 
     private fun requestLocationPermission() {
@@ -44,6 +72,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchItems() {
-        // TODO
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = safeApiCall { RetrofitClient.itemApiService.getItems() }
+
+            withContext(Dispatchers.Main) {
+                binding.swipeRefreshLayout.isRefreshing = false
+                when (result) {
+                    is Result.Success -> {
+                        handleOnSuccess(result.data)
+                    }
+
+                    //is Result.Error -> { }
+                    else -> Toast.makeText(this@MainActivity, "Error | API may be OFF", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
+
+    private fun handleOnSuccess(items: List<Item>) {
+        binding.recyclerView.adapter = ItemAdapter(items) { item ->
+            val intent = ItemDetailActivity.newIntent(this, item.id)
+            startActivity(intent)
+        }
+
+    }
+
+
 }
