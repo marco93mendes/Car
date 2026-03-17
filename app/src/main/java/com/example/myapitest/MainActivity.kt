@@ -99,9 +99,20 @@ class MainActivity : AppCompatActivity() {
     private fun checkLocationPermissionAndRequest() {
         when {
             ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED ->
-            {
+            && ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED -> {
                 getLastLocation()
+            }
+
+            shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION) -> {
+                locationPermissionLauncher.launch(ACCESS_FINE_LOCATION)
+            }
+
+            shouldShowRequestPermissionRationale(ACCESS_COARSE_LOCATION) -> {
+                locationPermissionLauncher.launch(ACCESS_COARSE_LOCATION)
+            }
+
+            else -> {
+                locationPermissionLauncher.launch(ACCESS_FINE_LOCATION)
             }
         }
     }
