@@ -25,47 +25,47 @@ class ItemDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityItemDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setupView()
-        loadItem()
+    //    setupView()
+    //    loadItem()
     }
 
-    private fun setupView() {
-        // Usamos a ActionBar do sistema que o Tema já fornece
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Car Details"
-    }
-
-    // Método para tratar o clique no botão voltar da ActionBar do sistema
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
-    }
-
-    private fun loadItem() {
-        val itemId = intent.getStringExtra(ARG_ID) ?: ""
-        CoroutineScope(Dispatchers.IO).launch {
-            val result = safeApiCall { RetrofitClient.itemApiService.getItem(itemId) }
-
-            withContext(Dispatchers.Main) {
-                when (result) {
-                    is Result.Success -> {
-                        item = result.data
-                        handleSuccess()
-                    }
-                    is Result.Error -> {
-                        Toast.makeText(this@ItemDetailActivity, "Error fetching details", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun handleSuccess() {
-        binding.image.loadUrl(item.imageUrl)
-        binding.name.text = "Model: ${item.name}"
-        binding.year.text = "Year: ${item.year}"
-        binding.licence.text = "Licence: ${item.licence}"
-    }
+//    private fun setupView() {
+//        // Usamos a ActionBar do sistema que o Tema já fornece
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.title = "Car Details"
+//    }
+//
+//    // Método para tratar o clique no botão voltar da ActionBar do sistema
+//    override fun onSupportNavigateUp(): Boolean {
+//        finish()
+//        return true
+//    }
+//
+//    private fun loadItem() {
+//        val itemId = intent.getStringExtra(ARG_ID) ?: ""
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val result = safeApiCall { RetrofitClient.itemApiService.getItem(itemId) }
+//
+//            withContext(Dispatchers.Main) {
+//                when (result) {
+//                    is Result.Success -> {
+//                        item = result.data
+//                        handleSuccess()
+//                    }
+//                    is Result.Error -> {
+//                        Toast.makeText(this@ItemDetailActivity, "Error fetching details", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun handleSuccess() {
+//        binding.image.loadUrl(item.imageUrl)
+//        binding.name.text = "Model: ${item.name}"
+//        binding.year.text = "Year: ${item.year}"
+//        binding.licence.text = "Licence: ${item.licence}"
+//    }
 
     companion object {
         private const val ARG_ID = "arg_id"
