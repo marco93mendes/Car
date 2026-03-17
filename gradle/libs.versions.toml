@@ -3,8 +3,13 @@ agp = "8.7.2"
 kotlin = "1.9.24"
 coreKtx = "1.15.0"
 
+playServicesLocation = "21.3.0"
+playServicesAuth = "21.2.0"
+maps = "19.0.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
