@@ -30,7 +30,7 @@
         <activity
             android:name=".ItemDetailActivity"
             android:exported="false"
-            android:label="Detalhes do Carro" />
+            android:label="Car Details" />
     </application>
 
 </manifest>

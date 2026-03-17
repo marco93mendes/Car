@@ -1,8 +1,16 @@
 package com.example.myapitest
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.location.Location
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapitest.adapater.ItemAdapter
 import com.example.myapitest.databinding.ActivityMainBinding
@@ -10,6 +18,9 @@ import com.example.myapitest.model.Item
 import com.example.myapitest.service.RetrofitClient
 import com.example.myapitest.service.safeApiCall
 import com.example.myapitest.service.Result
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.Task
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,12 +29,15 @@ import kotlinx.coroutines.withContext
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //requestLocationPermission() //TODO
+        requestLocationPermission()
         setupView()
 
 
@@ -68,7 +82,48 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestLocationPermission() {
-        // TODO
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        locationPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+                if (isGranted) {
+                    getLastLocation()
+                } else {
+                    Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        checkLocationPermissionAndRequest()
+    }
+
+    private fun checkLocationPermissionAndRequest() {
+        when {
+            ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED ->
+            {
+                getLastLocation()
+            }
+        }
+    }
+
+    private fun getLastLocation() {
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
+            && ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED
+        ) {
+            requestLocationPermission()
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnCompleteListener { task: Task<Location> ->
+            if (task.isSuccessful && task.result != null) {
+                val location = task.result
+                val latitude = location.latitude
+                val longitude = location.longitude
+            }
+            else {
+                Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun fetchItems() {
@@ -83,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     //is Result.Error -> { }
-                    else -> Toast.makeText(this@MainActivity, "Error | API may be OFF", Toast.LENGTH_SHORT).show()
+                    else -> Toast.makeText(this@MainActivity,"Error | API may be OFF",Toast.LENGTH_SHORT).show()
                 }
             }
         }
