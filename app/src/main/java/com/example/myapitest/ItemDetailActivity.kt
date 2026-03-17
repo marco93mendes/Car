@@ -25,21 +25,30 @@ class ItemDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityItemDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
-    //    setupView()
-    //    loadItem()
+        setupView()
+        //loadItem()
     }
 
-//    private fun setupView() {
-//        // Usamos a ActionBar do sistema que o Tema já fornece
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//        supportActionBar?.title = "Car Details"
-//    }
-//
-//    // Método para tratar o clique no botão voltar da ActionBar do sistema
-//    override fun onSupportNavigateUp(): Boolean {
-//        finish()
-//        return true
-//    }
+    companion object {
+        private const val ARG_ID = "arg_id"
+        fun newIntent(context: Context, itemId: String): Intent {
+            return Intent(context, ItemDetailActivity::class.java).apply {
+                putExtra(ARG_ID, itemId)
+            }
+        }
+    }
+
+    private fun setupView() {
+        // Usamos a ActionBar do sistema que o Tema já fornece
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = "Car Details"
+    }
+
+    // Metodo para tratar o clique no botão voltar da ActionBar do sistema
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
 //
 //    private fun loadItem() {
 //        val itemId = intent.getStringExtra(ARG_ID) ?: ""
@@ -67,12 +76,4 @@ class ItemDetailActivity : AppCompatActivity() {
 //        binding.licence.text = "Licence: ${item.licence}"
 //    }
 
-    companion object {
-        private const val ARG_ID = "arg_id"
-        fun newIntent(context: Context, itemId: String): Intent {
-            return Intent(context, ItemDetailActivity::class.java).apply {
-                putExtra(ARG_ID, itemId)
-            }
-        }
-    }
 }
