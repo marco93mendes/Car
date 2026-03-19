@@ -22,14 +22,6 @@ class ItemDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityItemDetailBinding
     private lateinit var item: Item
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityItemDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupView()
-        loadItem()
-    }
-
     companion object {
         private const val ARG_ID = "arg_id"
         fun newIntent(context: Context, itemId: String): Intent {
@@ -39,16 +31,46 @@ class ItemDetailActivity : AppCompatActivity() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityItemDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setupView()
+        loadItem()
+    }
+
     private fun setupView() {
-        // Usamos a ActionBar do sistema que o Tema já fornece
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Car Details"
+
+        binding.deleteCTA.setOnClickListener {
+            deleteItem()
+        }
     }
 
     // Metodo para tratar o clique no botão voltar da ActionBar do sistema
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    private fun deleteItem() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = safeApiCall { RetrofitClient.itemApiService.deleteItem(item.id) }
+            withContext(Dispatchers.Main) {
+                when (result) {
+                    is Result.Success -> handleSuccessDelete()
+                    is Result.Error -> {
+                        Toast.makeText(this@ItemDetailActivity, "Error deleting item", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    fun handleSuccessDelete() {
+        Toast.makeText(this@ItemDetailActivity, "Item deleted successfully", Toast.LENGTH_LONG).show()
+        finish()
     }
 
     private fun loadItem() {
@@ -61,7 +83,7 @@ class ItemDetailActivity : AppCompatActivity() {
                     is Result.Success -> {
                         item = result.data
                         Log.d("API_TEST", "Item recebido: $item")
-                        handleSuccess()
+                        handleSuccessLoad()
                     }
                     is Result.Error -> {
                         Toast.makeText(this@ItemDetailActivity, "Error fetching details", Toast.LENGTH_SHORT).show()
@@ -71,7 +93,7 @@ class ItemDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleSuccess() {
+    private fun handleSuccessLoad() {
         val car = item.value
         binding.image.loadUrl(car.imageUrl)
         binding.name.text = "Model: ${car.name}"
