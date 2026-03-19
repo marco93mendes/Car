@@ -16,11 +16,27 @@ import com.example.myapitest.service.RetrofitClient
 import com.example.myapitest.service.safeApiCall
 import com.example.myapitest.service.Result
 import com.example.myapitest.ui.loadUrl
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Marker
 
 class ItemDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityItemDetailBinding
     private lateinit var item: Item
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        
+        // Configuração necessária para o OSMDroid antes de inflar o layout
+        Configuration.getInstance().load(this, getSharedPreferences("osmdroid", MODE_PRIVATE))
+        
+        binding = ActivityItemDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setupView()
+        loadItem()
+    }
 
     companion object {
         private const val ARG_ID = "arg_id"
@@ -31,24 +47,20 @@ class ItemDetailActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityItemDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupView()
-        loadItem()
-    }
-
     private fun setupView() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Car Details"
+        
+        // Inicializa o mapa com algumas configurações básicas
+        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.setMultiTouchControls(true)
+        binding.map.controller.setZoom(15.0)
 
         binding.deleteCTA.setOnClickListener {
             deleteItem()
         }
     }
 
-    // Metodo para tratar o clique no botão voltar da ActionBar do sistema
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
@@ -99,6 +111,29 @@ class ItemDetailActivity : AppCompatActivity() {
         binding.name.text = "Model: ${car.name}"
         binding.year.text = "Year: ${car.year}"
         binding.licence.text = "Licence: ${car.licence}"
+        
+        // Configura a localização no mapa
+        val location = GeoPoint(car.place.lat, car.place.long)
+        binding.map.controller.setCenter(location)
+        
+        // Adiciona um marcador (pin) no local
+        val marker = Marker(binding.map)
+        marker.position = location
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.title = car.name
+        binding.map.overlays.add(marker)
+        
+        binding.map.invalidate() // Atualiza o mapa
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.map.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.map.onPause()
     }
 
 }
