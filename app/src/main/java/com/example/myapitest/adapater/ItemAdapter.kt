@@ -7,12 +7,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapitest.R
-import com.example.myapitest.model.Item
+import com.example.myapitest.model.ItemValue
 import com.example.myapitest.ui.loadUrl
 
 class ItemAdapter(
-    private val items: List<Item>,
-    private val onItemClick: (Item) -> Unit
+    private val items: List<ItemValue>,
+    private val onItemClick: (ItemValue) -> Unit
 ): RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
     class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -32,13 +32,13 @@ class ItemAdapter(
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val item = items[position]
-        holder.imageView.loadUrl(item.imageUrl)
-        holder.modelTextView.text = item.name
-        holder.yearTextView.text = item.year
-        holder.licenceTextView.text = item.licence
+        val car = items[position]
+        holder.imageView.loadUrl(car.imageUrl)
+        holder.modelTextView.text = car.name
+        holder.yearTextView.text = car.year
+        holder.licenceTextView.text = car.licence
         holder.itemView.setOnClickListener {
-            onItemClick(item)
+            onItemClick(car)
         }
 
     }
