@@ -35,7 +35,6 @@ class ItemDetailActivity : AppCompatActivity() {
         binding = ActivityItemDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupView()
-        loadItem()
     }
 
     companion object {
@@ -60,7 +59,6 @@ class ItemDetailActivity : AppCompatActivity() {
             val intent = Intent(this, FormActivity::class.java)
             intent.putExtra("item", item)
             startActivity(intent)
-
         }
 
         binding.deleteCTA.setOnClickListener {
@@ -101,7 +99,6 @@ class ItemDetailActivity : AppCompatActivity() {
                 when (result) {
                     is Result.Success -> {
                         item = result.data
-                        Log.d("API_TEST", "Item recebido: $item")
                         handleSuccessLoad()
                     }
                     is Result.Error -> {
@@ -123,6 +120,9 @@ class ItemDetailActivity : AppCompatActivity() {
         val location = GeoPoint(car.place.lat, car.place.long)
         binding.map.controller.setCenter(location)
         
+        // Limpa marcadores anteriores para evitar duplicatas ao recarregar
+        binding.map.overlays.clear()
+        
         // Adiciona um marcador (pin) no local
         val marker = Marker(binding.map)
         marker.position = location
@@ -136,6 +136,7 @@ class ItemDetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.map.onResume()
+        loadItem()
     }
 
     override fun onPause() {
