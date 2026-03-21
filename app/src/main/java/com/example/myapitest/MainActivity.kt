@@ -130,7 +130,6 @@ class MainActivity : AppCompatActivity() {
                 val location = task.result
                 val latitude = location.latitude
                 val longitude = location.longitude
-                Toast.makeText(this, "Location: $latitude, $longitude", Toast.LENGTH_SHORT).show()
             }
             else {
                 Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show()
@@ -149,8 +148,9 @@ class MainActivity : AppCompatActivity() {
                         handleOnSuccess(result.data)
                     }
 
-                    //is Result.Error -> { }
-                    else -> Toast.makeText(this@MainActivity,"Error | API may be OFF",Toast.LENGTH_SHORT).show()
+                    is Result.Error -> {
+                        Toast.makeText(this@MainActivity,"Error | API may be OFF",Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
