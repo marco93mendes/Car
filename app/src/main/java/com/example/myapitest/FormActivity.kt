@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class FormActivity : AppCompatActivity() {
 
@@ -60,14 +61,13 @@ class FormActivity : AppCompatActivity() {
         val long = binding.lng.text.toString().toDoubleOrNull() ?: 0.0
 
         val itemValue = ItemValue(
-            id = item?.value?.id ?: "",
+            id = item?.value?.id ?: UUID.randomUUID().toString(),
             imageUrl = imageUrl,
             year = year,
             name = name,
             licence = licence,
             place = ItemLocation(lat, long)
         )
-
 
         CoroutineScope(Dispatchers.IO).launch {
             val result = if (item == null) {

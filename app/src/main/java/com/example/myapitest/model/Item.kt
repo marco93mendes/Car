@@ -1,6 +1,7 @@
 package com.example.myapitest.model
 
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -22,5 +23,5 @@ data class ItemValue(
 @Parcelize
 data class ItemLocation(
     val lat: Double,
-    val long: Double
+    @SerializedName("long") val long: Double
 ) : Parcelable
