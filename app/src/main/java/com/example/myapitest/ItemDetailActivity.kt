@@ -56,6 +56,12 @@ class ItemDetailActivity : AppCompatActivity() {
         binding.map.setMultiTouchControls(true)
         binding.map.controller.setZoom(15.0)
 
+        binding.editCTA.setOnClickListener {
+            val intent = Intent(this, FormActivity::class.java)
+            intent.putExtra("item_id", item.id)
+            startActivity(intent)
+        }
+
         binding.deleteCTA.setOnClickListener {
             deleteItem()
         }
