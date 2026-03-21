@@ -58,7 +58,7 @@ class ItemDetailActivity : AppCompatActivity() {
 
         binding.editCTA.setOnClickListener {
             val intent = Intent(this, FormActivity::class.java)
-            intent.putExtra("item_id", item.id)
+            intent.putExtra("item", item)
             startActivity(intent)
         }
 
