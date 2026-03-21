@@ -60,6 +60,7 @@ class ItemDetailActivity : AppCompatActivity() {
             val intent = Intent(this, FormActivity::class.java)
             intent.putExtra("item", item)
             startActivity(intent)
+
         }
 
         binding.deleteCTA.setOnClickListener {
