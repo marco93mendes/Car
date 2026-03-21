@@ -2,6 +2,7 @@ package com.example.myapitest
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.location.Location
@@ -77,7 +78,8 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
 
         binding.addCta.setOnClickListener {
-            //TODO
+            val intent = Intent(this, FormActivity::class.java)
+            startActivity(intent)
         }
     }
 
