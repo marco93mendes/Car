@@ -16,6 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.IntentCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.myapitest.databinding.ActivityFormBinding
 import com.example.myapitest.model.Item
 import com.example.myapitest.model.ItemLocation
@@ -170,30 +171,31 @@ class FormActivity : AppCompatActivity() {
 
         binding.imageUrl.setText("Uploading...")
         binding.takePictureCta.isEnabled = false
+        binding.saveCTA.isEnabled = false
 
         val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val result = safeApiCall { RetrofitClient.imgBBService.uploadImage(IMGBB_API_KEY, body) }
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                safeApiCall { RetrofitClient.imgBBService.uploadImage(IMGBB_API_KEY, body) }
+            }
 
-            withContext(Dispatchers.Main) {
-                binding.takePictureCta.isEnabled = true
-                when (result) {
-                    is Result.Success -> {
-                        val response = result.data
-                        if (response.isSuccessful && response.body() != null) {
-                            binding.imageUrl.setText(response.body()!!.data.url)
-                            Toast.makeText(this@FormActivity, "Upload Success!", Toast.LENGTH_SHORT).show()
-                        } else {
-                            binding.imageUrl.setText("")
-                            Toast.makeText(this@FormActivity, "Upload Failed: ${response.message()}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    is Result.Error -> {
+            binding.takePictureCta.isEnabled = true
+            binding.saveCTA.isEnabled = true
+            when (result) {
+                is Result.Success -> {
+                    val response = result.data
+                    if (response.isSuccessful && response.body() != null) {
+                        binding.imageUrl.setText(response.body()!!.data.url)
+                    } else {
                         binding.imageUrl.setText("")
-                        Toast.makeText(this@FormActivity, "Upload Failed: ${result.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@FormActivity, "Upload Failed: ${response.message()}", Toast.LENGTH_SHORT).show()
                     }
+                }
+                is Result.Error -> {
+                    binding.imageUrl.setText("")
+                    Toast.makeText(this@FormActivity, "Upload Failed: ${result.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -202,8 +204,12 @@ class FormActivity : AppCompatActivity() {
     private fun validate(): Boolean {
         var isValid = true
 
-        if (binding.imageUrl.text.toString().isBlank()) {
+        val imageUrl = binding.imageUrl.text.toString()
+        if (imageUrl.isBlank()) {
             binding.imageUrlLayout.error = "Required"
+            isValid = false
+        } else if (imageUrl == "Uploading...") {
+            binding.imageUrlLayout.error = "Wait for upload to finish"
             isValid = false
         } else {
             binding.imageUrlLayout.error = null
@@ -252,23 +258,23 @@ class FormActivity : AppCompatActivity() {
             place = ItemLocation(lat, long)
         )
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val result = if (item == null) {
-                safeApiCall { RetrofitClient.itemApiService.addItem(itemValue) }
-            } else {
-                safeApiCall { RetrofitClient.itemApiService.updateItem(item!!.id, itemValue) }
+        lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                if (item == null) {
+                    safeApiCall { RetrofitClient.itemApiService.addItem(itemValue) }
+                } else {
+                    safeApiCall { RetrofitClient.itemApiService.updateItem(item!!.id, itemValue) }
+                }
             }
 
-            withContext(Dispatchers.Main) {
-                when (result) {
-                    is Result.Success -> {
-                        Toast.makeText(this@FormActivity, "Item saved successfully", Toast.LENGTH_LONG).show()
-                        setResult(RESULT_OK)
-                        finish()
-                    }
-                    is Result.Error -> {
-                        Toast.makeText(this@FormActivity, "Error saving item: ${result.message}", Toast.LENGTH_SHORT).show()
-                    }
+            when (result) {
+                is Result.Success -> {
+                    Toast.makeText(this@FormActivity, "Item saved successfully", Toast.LENGTH_LONG).show()
+                    setResult(RESULT_OK)
+                    finish()
+                }
+                is Result.Error -> {
+                    Toast.makeText(this@FormActivity, "Error saving item: ${result.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
