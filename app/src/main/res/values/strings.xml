@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MyApiTest - Marco Antonio Pio Mendes</string>
+    <string name="hint_cellphone">+5511912345678</string>
+    <string name="code_brazil">+55</string>
+    <string name="send_sms">SEND SMS</string>
+    <string name="hint_verify_sms">123456</string>
+    <string name="verify_sms">VERIFY SMS</string>
 </resources>
