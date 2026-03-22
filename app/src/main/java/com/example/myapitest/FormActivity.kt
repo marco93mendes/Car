@@ -16,7 +16,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
 
 class FormActivity : AppCompatActivity() {
 
@@ -36,6 +35,7 @@ class FormActivity : AppCompatActivity() {
         val car = item?.value
 
         if (car != null) {
+            supportActionBar?.title = "Edit car"
             binding.imagePreview.loadUrl(car.imageUrl)
             binding.image.setText(car.imageUrl)
             binding.name.setText(car.name)
@@ -43,6 +43,8 @@ class FormActivity : AppCompatActivity() {
             binding.licence.setText(car.licence)
             binding.lat.setText(car.place.lat.toString())
             binding.lng.setText(car.place.long.toString())
+        } else {
+            supportActionBar?.title = "New car"
         }
 
         binding.saveCTA.setOnClickListener {
@@ -61,7 +63,7 @@ class FormActivity : AppCompatActivity() {
         val long = binding.lng.text.toString().toDoubleOrNull() ?: 0.0
 
         val itemValue = ItemValue(
-            id = item?.value?.id ?: UUID.randomUUID().toString(),
+            id = item?.value?.id ?: System.currentTimeMillis().toString(),
             imageUrl = imageUrl,
             year = year,
             name = name,
