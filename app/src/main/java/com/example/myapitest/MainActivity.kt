@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.location.Location
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,14 +41,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         requestLocationPermission()
         setupView()
-
-
-        //////////////////////////////////////////////////////////
-        //1- post, delete e patch
-        //2- pagina de login firebase
-        //3- imagens do firebase
-        //4- google maps
-        //////////////////////////////////////////////////////////
 
 
         // 1- Criar tela de Login com algum provedor do Firebase (Telefone, Google)
@@ -151,7 +144,9 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     is Result.Error -> {
-                        Toast.makeText(this@MainActivity,"Error | API may be OFF",Toast.LENGTH_SHORT).show()
+                        binding.emptyState.text = "Api server seems offline"
+                        binding.emptyState.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.GONE
                     }
                 }
             }
@@ -159,12 +154,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleOnSuccess(items: List<ItemValue>) {
+        if (items.isEmpty()) {
+            binding.emptyState.text = "List is empty"
+            binding.emptyState.visibility = View.VISIBLE
+            binding.recyclerView.visibility = View.GONE
+        } else {
+            binding.emptyState.visibility = View.GONE
+            binding.recyclerView.visibility = View.VISIBLE
+        }
         binding.recyclerView.adapter = ItemAdapter(items) { item ->
             val intent = ItemDetailActivity.newIntent(this, item.id)
             startActivity(intent)
         }
-
     }
-
-
 }
