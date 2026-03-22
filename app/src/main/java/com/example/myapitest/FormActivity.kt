@@ -36,7 +36,7 @@ class FormActivity : AppCompatActivity() {
 
         if (car != null) {
             supportActionBar?.title = "Edit car"
-            binding.imagePreview.loadUrl(car.imageUrl)
+            //binding.imagePreview.loadUrl(car.imageUrl)
             binding.image.setText(car.imageUrl)
             binding.name.setText(car.name)
             binding.year.setText(car.year)
