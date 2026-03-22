@@ -38,7 +38,7 @@
         <activity
             android:name=".ItemDetailActivity"
             android:exported="false"
-            android:label="Car Details" />
+            android:label="Details" />
     </application>
 
 </manifest>
