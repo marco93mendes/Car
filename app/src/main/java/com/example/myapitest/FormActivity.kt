@@ -28,6 +28,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -38,12 +41,14 @@ class FormActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFormBinding
     private var item: Item? = null
     private lateinit var imageUri: Uri
+    private var photoFile: File? = null
+    private var currentPhotoPath: String? = null
 
     private val cameraLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
         if (it.resultCode == RESULT_OK) {
-            binding.imageUrl.setText("IMAGE OBTAINED!")
+            uploadImage()
         }
     }
 
@@ -53,12 +58,25 @@ class FormActivity : AppCompatActivity() {
         binding = ActivityFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        savedInstanceState?.getString("photoPath")?.let {
+            currentPhotoPath = it
+            photoFile = File(it)
+        }
+
         setupView()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        currentPhotoPath?.let {
+            outState.putString("photoPath", it)
+        }
     }
 
     companion object {
         private const val EXTRA_ITEM = "item"
         private const val CAMERA_PERMISSION_REQUEST_CODE = 1002
+        private const val IMGBB_API_KEY = "60981f6964dfc77f80db0f38690399cc"
 
         fun newIntent(context: Context, item: Item? = null): Intent {
             return Intent(context, FormActivity::class.java).apply {
@@ -108,7 +126,9 @@ class FormActivity : AppCompatActivity() {
             saveItem()
         }
 
-        binding.cancelCTA.setOnClickListener { finish() }
+        binding.cancelCTA.setOnClickListener {
+            finish()
+        }
     }
 
     fun takePicture() {
@@ -125,20 +145,58 @@ class FormActivity : AppCompatActivity() {
 
     private fun openCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        imageUri = createImageUri()
+        val file = createImageFile()
+        photoFile = file
+        currentPhotoPath = file.absolutePath
+        
+        imageUri = FileProvider.getUriForFile(this, "com.example.myapitest.fileprovider", file)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
         cameraLauncher.launch(intent)
     }
 
-    private fun createImageUri(): Uri {
+    private fun createImageFile(): File {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
-
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+    }
 
-        val imageFile = File.createTempFile(imageFileName, ".jpg", storageDir)
+    private fun uploadImage() {
+        val file = photoFile ?: currentPhotoPath?.let { File(it) }
+        
+        if (file == null || !file.exists()) {
+            Toast.makeText(this, "Image file not found", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        return FileProvider.getUriForFile(this, "com.example.myapitest.fileprovider", imageFile)
+        binding.imageUrl.setText("Uploading...")
+        binding.takePictureCta.isEnabled = false
+
+        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = safeApiCall { RetrofitClient.imgBBService.uploadImage(IMGBB_API_KEY, body) }
+
+            withContext(Dispatchers.Main) {
+                binding.takePictureCta.isEnabled = true
+                when (result) {
+                    is Result.Success -> {
+                        val response = result.data
+                        if (response.isSuccessful && response.body() != null) {
+                            binding.imageUrl.setText(response.body()!!.data.url)
+                            Toast.makeText(this@FormActivity, "Upload Success!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            binding.imageUrl.setText("")
+                            Toast.makeText(this@FormActivity, "Upload Failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    is Result.Error -> {
+                        binding.imageUrl.setText("")
+                        Toast.makeText(this@FormActivity, "Upload Failed: ${result.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
 
     private fun validate(): Boolean {
