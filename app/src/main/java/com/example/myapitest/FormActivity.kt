@@ -54,7 +54,43 @@ class FormActivity : AppCompatActivity() {
         binding.cancelCTA.setOnClickListener { finish() }
     }
 
+    private fun validate(): Boolean {
+        var isValid = true
+
+        if (binding.image.text.toString().isBlank()) {
+            binding.imageLayout.error = "Required"
+            isValid = false
+        } else {
+            binding.imageLayout.error = null
+        }
+
+        if (binding.name.text.toString().isBlank()) {
+            binding.nameLayout.error = "Required"
+            isValid = false
+        } else {
+            binding.nameLayout.error = null
+        }
+
+        if (binding.year.text.toString().isBlank()) {
+            binding.yearLayout.error = "Required"
+            isValid = false
+        } else {
+            binding.yearLayout.error = null
+        }
+
+        if (binding.licence.text.toString().isBlank()) {
+            binding.licenceLayout.error = "Required"
+            isValid = false
+        } else {
+            binding.licenceLayout.error = null
+        }
+
+        return isValid
+    }
+
     private fun saveItem() {
+        if (!validate()) return
+
         val name = binding.name.text.toString()
         val year = binding.year.text.toString()
         val licence = binding.licence.text.toString()
