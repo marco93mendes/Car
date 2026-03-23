@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
                 if (isGranted) {
                     getLastLocation()
                 } else {
-                    Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.error_location_denied), Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -138,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                 val longitude = location.longitude
             }
             else {
-                Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.error_location_unavailable), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -155,7 +155,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     is Result.Error -> {
-                        binding.emptyState.text = "Api server seems offline"
+                        binding.emptyState.text = getString(R.string.error_api_offline)
                         binding.emptyState.visibility = View.VISIBLE
                         binding.recyclerView.visibility = View.GONE
                     }
@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleOnSuccess(items: List<ItemValue>) {
         if (items.isEmpty()) {
-            binding.emptyState.text = "List is empty"
+            binding.emptyState.text = getString(R.string.list_is_empty)
             binding.emptyState.visibility = View.VISIBLE
             binding.recyclerView.visibility = View.GONE
         } else {

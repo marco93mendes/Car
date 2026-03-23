@@ -1,9 +1,42 @@
 <resources>
-    <string name="app_name">MyApiTest - Marco Antonio Pio Mendes</string>
+    <string name="app_name">Car App</string>
     <string name="hint_cellphone">+5511912345678</string>
     <string name="code_brazil">+55</string>
     <string name="send_sms">SEND SMS</string>
     <string name="hint_verify_sms">123456</string>
     <string name="verify_sms">VERIFY SMS</string>
-    <string name="menu_loggout">Loggout</string>
+    <string name="menu_logout">Logout</string>
+
+    <!-- MainActivity -->
+    <string name="error_location_denied">Location permission denied</string>
+    <string name="error_location_unavailable">Location not available</string>
+    <string name="error_api_offline">Api server seems offline</string>
+    <string name="list_is_empty">List is empty</string>
+
+    <!-- FormActivity -->
+    <string name="title_edit_car">Edit car</string>
+    <string name="title_new_car">New car</string>
+    <string name="error_camera_denied">Camera permission denied</string>
+    <string name="error_image_not_found">Image file not found</string>
+    <string name="msg_uploading">Uploading...</string>
+    <string name="error_upload_failed">Upload Failed: %1$s</string>
+    <string name="msg_item_saved">Item saved successfully</string>
+    <string name="error_save_item">Error saving item: %1$s</string>
+    <string name="error_required">Required</string>
+    <string name="error_wait_upload">Wait for upload to finish</string>
+
+    <!-- ItemDetailActivity -->
+    <string name="title_car_details">Car details</string>
+    <string name="msg_item_deleted">Item deleted successfully</string>
+    <string name="error_delete_item">Error deleting item</string>
+    <string name="error_fetch_details">Error fetching details</string>
+    <string name="label_model">Model: %1$s</string>
+    <string name="label_year">Year: %1$s</string>
+    <string name="label_licence">Licence: %1$s</string>
+
+    <!-- LoginActivity -->
+    <string name="msg_code_sent">Código enviado!</string>
+    <string name="msg_login_success">Login realizado!</string>
+    <string name="error_invalid_code">Código incorreto</string>
+    <string name="error_generic">Erro: %1$s</string>
 </resources>
