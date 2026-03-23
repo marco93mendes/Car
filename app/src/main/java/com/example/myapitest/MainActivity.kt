@@ -4,10 +4,11 @@ import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.location.Location
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -24,6 +25,7 @@ import com.example.myapitest.service.Result
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,26 +44,34 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         requestLocationPermission()
         setupView()
-
-
-        // 1- Criar tela de Login com algum provedor do Firebase (Telefone, Google)
-        //      Cadastrar o Seguinte celular para login de test: +5511912345678
-        //      Código de verificação: 101010
-
-        // 2- Criar Opção de Logout no aplicativo
-
-        // 3- Integrar API REST /car no aplicativo
-        //      API será disponibilida no Github
-        //      JSON Necessário para salvar e exibir no aplicativo
-        //      O Image Url deve ser uma foto armazenada no Firebase Storage
-        //      { "id": "001", "imageUrl":"https://image", "year":"2020/2020", "name":"Gaspar", "licence":"ABC-1234", "place": {"lat": 0, "long": 0} }
-
-        // Opcionalmente trabalhar com o Google Maps ara enviar o place
     }
 
     override fun onResume() {
         super.onResume()
         fetchItems()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_logout -> {
+                onLogout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun onLogout() {
+        FirebaseAuth.getInstance().signOut()
+        val intent = LoginActivity.newIntent(this)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 
     private fun setupView() {

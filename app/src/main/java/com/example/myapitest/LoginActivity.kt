@@ -1,5 +1,6 @@
 package com.example.myapitest
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -32,6 +33,22 @@ class LoginActivity : AppCompatActivity() {
         skipLogin() //ONLY FOR TESTS
         setupView()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        verifyLoggedUser()
+    }
+
+    private fun verifyLoggedUser() {
+        if (auth.currentUser != null) {
+            navigateToMainActivity()
+        }
+    }
+
+    private fun navigateToMainActivity() {
+        startActivity(MainActivity.newIntent(this))
+        finish()
     }
 
     private fun skipLogin() {
@@ -99,10 +116,14 @@ class LoginActivity : AppCompatActivity() {
 
     fun onCredentialCompleteListener(task: Task<AuthResult>) {
         if (task.isSuccessful) {
-            startActivity(MainActivity.newIntent(this))
-            finish()
+            navigateToMainActivity()
         } else {
             Toast.makeText(this, "${task.exception?.message}", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    companion object {
+        fun newIntent(context: Context) =
+            Intent(context, LoginActivity::class.java)
     }
 }
