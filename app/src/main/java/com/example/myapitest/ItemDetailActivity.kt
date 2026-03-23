@@ -48,7 +48,7 @@ class ItemDetailActivity : AppCompatActivity() {
 
     private fun setupView() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Car Details"
+        supportActionBar?.title = "Car details"
         
         // Inicializa o mapa com algumas configurações básicas
         binding.map.setTileSource(TileSourceFactory.MAPNIK)
