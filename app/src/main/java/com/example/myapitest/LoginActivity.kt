@@ -78,16 +78,15 @@ class LoginActivity : AppCompatActivity() {
             .setCallbacks(object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
                 override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                    TODO("Not yet implemented")
+                    signInWithPhoneAuthCredential(credential)
                 }
 
                 override fun onVerificationFailed(exception: FirebaseException) {
                     Toast.makeText(
                         this@LoginActivity,
-                        "Verification failed: ${exception.message}",
+                        getString(R.string.error_generic, exception.message),
                         Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    ).show()
                 }
 
                 override fun onCodeSent(
@@ -97,8 +96,7 @@ class LoginActivity : AppCompatActivity() {
                     this@LoginActivity.verificationId = verificationId
                     binding.verifyCode.visibility = View.VISIBLE
                     binding.btnVerifySms.visibility = View.VISIBLE
-                    Toast.makeText(this@LoginActivity, "Code sent via SMS", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(this@LoginActivity, getString(R.string.msg_code_sent), Toast.LENGTH_SHORT).show()
                 }
             })
             .build()
@@ -107,18 +105,24 @@ class LoginActivity : AppCompatActivity() {
 
     fun verifyCode() {
         val code = binding.verifyCode.text.toString()
-        val credential = PhoneAuthProvider.getCredential(verificationId, code)
+        if (verificationId.isNotEmpty() && code.isNotEmpty()) {
+            val credential = PhoneAuthProvider.getCredential(verificationId, code)
+            signInWithPhoneAuthCredential(credential)
+        }
+    }
+
+    private fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
         auth.signInWithCredential(credential)
-            .addOnCompleteListener {
-                onCredentialCompleteListener(it)
+            .addOnCompleteListener(this) { task ->
+                onCredentialCompleteListener(task)
             }
     }
 
-    fun onCredentialCompleteListener(task: Task<AuthResult>) {
+    private fun onCredentialCompleteListener(task: Task<AuthResult>) {
         if (task.isSuccessful) {
             navigateToMainActivity()
         } else {
-            Toast.makeText(this, "${task.exception?.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_generic, task.exception?.message), Toast.LENGTH_SHORT).show()
         }
     }
 
