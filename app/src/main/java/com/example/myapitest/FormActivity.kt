@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -25,12 +26,19 @@ import com.example.myapitest.model.ItemValue
 import com.example.myapitest.service.Result
 import com.example.myapitest.service.RetrofitClient
 import com.example.myapitest.service.safeApiCall
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -43,6 +51,7 @@ class FormActivity : AppCompatActivity() {
     private lateinit var imageUri: Uri
     private var photoFile: File? = null
     private var currentPhotoPath: String? = null
+    private var marker: Marker? = null
 
     private val cameraLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -52,9 +61,9 @@ class FormActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Configuration.getInstance().load(this, getSharedPreferences("osmdroid", MODE_PRIVATE))
         binding = ActivityFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -66,6 +75,57 @@ class FormActivity : AppCompatActivity() {
         }
 
         setupView()
+        setupMap()
+    }
+
+    private fun setupMap() {
+        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.setMultiTouchControls(true)
+        binding.map.controller.setZoom(15.0)
+
+        val car = item?.value
+        if (car != null) {
+            val geoPoint = GeoPoint(car.place.lat, car.place.long)
+            updateMarker(geoPoint)
+        } else {
+            getCurrentLocation()
+        }
+
+        val mapEventsReceiver = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                p?.let { updateMarker(it) }
+                return true
+            }
+
+            override fun longPressHelper(p: GeoPoint?): Boolean {
+                return false
+            }
+        }
+        binding.map.overlays.add(MapEventsOverlay(mapEventsReceiver))
+    }
+
+    private fun updateMarker(geoPoint: GeoPoint) {
+        if (marker == null) {
+            marker = Marker(binding.map)
+            marker?.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            binding.map.overlays.add(marker)
+        }
+        marker?.position = geoPoint
+        binding.map.controller.animateTo(geoPoint)
+        binding.lat.setText(geoPoint.latitude.toString())
+        binding.lng.setText(geoPoint.longitude.toString())
+        binding.map.invalidate()
+    }
+
+    private fun getCurrentLocation() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                location?.let {
+                    updateMarker(GeoPoint(it.latitude, it.longitude))
+                }
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -106,7 +166,7 @@ class FormActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openCamera()
                 } else {
-                    Toast.makeText(this, getString(R.string.error_location_denied), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.error_camera_denied), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -283,5 +343,15 @@ class FormActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.map.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.map.onPause()
     }
 }
