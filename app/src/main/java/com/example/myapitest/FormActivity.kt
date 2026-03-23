@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,8 +25,6 @@ import com.example.myapitest.model.ItemValue
 import com.example.myapitest.service.Result
 import com.example.myapitest.service.RetrofitClient
 import com.example.myapitest.service.safeApiCall
-import com.example.myapitest.ui.loadUrl
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,6 +58,8 @@ class FormActivity : AppCompatActivity() {
         binding = ActivityFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         savedInstanceState?.getString("photoPath")?.let {
             currentPhotoPath = it
             photoFile = File(it)
@@ -72,6 +73,14 @@ class FormActivity : AppCompatActivity() {
         currentPhotoPath?.let {
             outState.putString("photoPath", it)
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     companion object {
@@ -125,10 +134,6 @@ class FormActivity : AppCompatActivity() {
 
         binding.saveCTA.setOnClickListener {
             saveItem()
-        }
-
-        binding.cancelCTA.setOnClickListener {
-            finish()
         }
     }
 

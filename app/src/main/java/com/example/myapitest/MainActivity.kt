@@ -2,6 +2,7 @@ package com.example.myapitest
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -167,4 +168,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    companion object {
+        fun newIntent(context: Context) =
+            Intent(context, MainActivity::class.java)
+    }
+
 }

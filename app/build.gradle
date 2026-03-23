@@ -1,8 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.services)
     id 'kotlin-kapt'
     id 'kotlin-parcelize'
+
 }
 
 android {
@@ -84,6 +86,11 @@ dependencies {
     implementation 'org.osmdroid:osmdroid-android:6.1.18'
 
     implementation(libs.play.services.auth)
+
+    // Firebase dependencies
+    implementation platform(libs.firebase.bom)
+    implementation("com.google.firebase:firebase-analytics")
+    implementation libs.firebase.auth
 
     implementation "androidx.room:room-runtime:2.6.1"
     kapt "androidx.room:room-compiler:2.6.1"
