@@ -106,7 +106,7 @@ class FormActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openCamera()
                 } else {
-                    Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.error_location_denied), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -117,7 +117,7 @@ class FormActivity : AppCompatActivity() {
         val car = item?.value
 
         if (car != null) {
-            supportActionBar?.title = "Edit car"
+            supportActionBar?.title = getString(R.string.title_edit_car)
             binding.imageUrl.setText(car.imageUrl)
             binding.name.setText(car.name)
             binding.year.setText(car.year)
@@ -125,7 +125,7 @@ class FormActivity : AppCompatActivity() {
             binding.lat.setText(car.place.lat.toString())
             binding.lng.setText(car.place.long.toString())
         } else {
-            supportActionBar?.title = "New car"
+            supportActionBar?.title = getString(R.string.title_new_car)
         }
 
         binding.takePictureCta.setOnClickListener {
@@ -170,11 +170,11 @@ class FormActivity : AppCompatActivity() {
         val file = photoFile ?: currentPhotoPath?.let { File(it) }
         
         if (file == null || !file.exists()) {
-            Toast.makeText(this, "Image file not found", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_image_not_found), Toast.LENGTH_SHORT).show()
             return
         }
 
-        binding.imageUrl.setText("Uploading...")
+        binding.imageUrl.setText(getString(R.string.msg_uploading))
         binding.takePictureCta.isEnabled = false
         binding.saveCTA.isEnabled = false
 
@@ -195,12 +195,12 @@ class FormActivity : AppCompatActivity() {
                         binding.imageUrl.setText(response.body()!!.data.url)
                     } else {
                         binding.imageUrl.setText("")
-                        Toast.makeText(this@FormActivity, "Upload Failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@FormActivity, getString(R.string.error_upload_failed, response.message()), Toast.LENGTH_SHORT).show()
                     }
                 }
                 is Result.Error -> {
                     binding.imageUrl.setText("")
-                    Toast.makeText(this@FormActivity, "Upload Failed: ${result.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@FormActivity, getString(R.string.error_upload_failed, result.message), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -211,31 +211,31 @@ class FormActivity : AppCompatActivity() {
 
         val imageUrl = binding.imageUrl.text.toString()
         if (imageUrl.isBlank()) {
-            binding.imageUrlLayout.error = "Required"
+            binding.imageUrlLayout.error = getString(R.string.error_required)
             isValid = false
-        } else if (imageUrl == "Uploading...") {
-            binding.imageUrlLayout.error = "Wait for upload to finish"
+        } else if (imageUrl == getString(R.string.msg_uploading)) {
+            binding.imageUrlLayout.error = getString(R.string.error_wait_upload)
             isValid = false
         } else {
             binding.imageUrlLayout.error = null
         }
 
         if (binding.name.text.toString().isBlank()) {
-            binding.nameLayout.error = "Required"
+            binding.nameLayout.error = getString(R.string.error_required)
             isValid = false
         } else {
             binding.nameLayout.error = null
         }
 
         if (binding.year.text.toString().isBlank()) {
-            binding.yearLayout.error = "Required"
+            binding.yearLayout.error = getString(R.string.error_required)
             isValid = false
         } else {
             binding.yearLayout.error = null
         }
 
         if (binding.licence.text.toString().isBlank()) {
-            binding.licenceLayout.error = "Required"
+            binding.licenceLayout.error = getString(R.string.error_required)
             isValid = false
         } else {
             binding.licenceLayout.error = null
@@ -274,12 +274,12 @@ class FormActivity : AppCompatActivity() {
 
             when (result) {
                 is Result.Success -> {
-                    Toast.makeText(this@FormActivity, "Item saved successfully", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@FormActivity, getString(R.string.msg_item_saved), Toast.LENGTH_LONG).show()
                     setResult(RESULT_OK)
                     finish()
                 }
                 is Result.Error -> {
-                    Toast.makeText(this@FormActivity, "Error saving item: ${result.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@FormActivity, getString(R.string.error_save_item, result.message), Toast.LENGTH_SHORT).show()
                 }
             }
         }
